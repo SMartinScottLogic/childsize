@@ -20,7 +20,7 @@ features = ["with-system-locale"]
 
 # an utility for human-readable bytes representations
 [dependencies.bytesize]
-version = "1.1.0"
+version = "1.2.0"
 
 # Collection “literal” macros for HashMap, HashSet, BTreeMap, and BTreeSet.
 [dev-dependencies.maplit]
