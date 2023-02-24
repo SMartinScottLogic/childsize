@@ -12,13 +12,13 @@ use bytesize::ByteSize;
 #[derive(Debug)]
 pub enum SortMode {
     /// Sort by contained number of files
-	Count,
+    Count,
     /// Sort by total size of internal files
-	Total,
+    Total,
     /// Sort by average size of internal files
-	Average,
+    Average,
     /// Sort by maximum size of internal files
-	Max
+    Max,
 }
 
 /// Details of internal files within a folder
@@ -86,11 +86,17 @@ pub fn process(sort: SortMode, reverse: bool, entries: HashMap<String, ChildSize
         })
         .collect();
     match sort {
-		SortMode::Count => entries.sort_unstable_by(|a, b| a.1.count.partial_cmp(&b.1.count).unwrap()),
-		SortMode::Average => entries.sort_unstable_by(|a, b| a.1.average.partial_cmp(&b.1.average).unwrap()),
-		SortMode::Total => entries.sort_unstable_by(|a, b| a.1.total.partial_cmp(&b.1.total).unwrap()),
-		SortMode::Max => entries.sort_unstable_by(|a, b| a.1.max.partial_cmp(&b.1.max).unwrap()),
-	}
+        SortMode::Count => {
+            entries.sort_unstable_by(|a, b| a.1.count.partial_cmp(&b.1.count).unwrap())
+        }
+        SortMode::Average => {
+            entries.sort_unstable_by(|a, b| a.1.average.partial_cmp(&b.1.average).unwrap())
+        }
+        SortMode::Total => {
+            entries.sort_unstable_by(|a, b| a.1.total.partial_cmp(&b.1.total).unwrap())
+        }
+        SortMode::Max => entries.sort_unstable_by(|a, b| a.1.max.partial_cmp(&b.1.max).unwrap()),
+    }
     if reverse {
         entries.reverse();
     }
@@ -109,14 +115,8 @@ fn filefold(
 ) -> HashMap<String, ChildSizeEntry> {
     if e.file_type().is_file() {
         let key = e
-            .path().parent()
-            //.strip_prefix(base)
-            //.unwrap()
-            //.components().next()
-            //.and_then(|p| match p {
-            //    std::path::Component::Normal(p) => Some(p),
-            //    _ => None,
-            //})
+            .path()
+            .parent()
             .map(|n| n.to_string_lossy())
             .map(|n| n.to_string())
             .unwrap_or_else(|| "".to_string());

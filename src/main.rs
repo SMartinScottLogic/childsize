@@ -18,12 +18,12 @@ fn main() {
     let opts: Opts = Opts::parse();
     println!("{opts:?}");
 
-let mut entries: HashMap<String, ChildSizeEntry> = HashMap::new();
+    let mut entries: HashMap<String, ChildSizeEntry> = HashMap::new();
 
-for path in opts.paths {
-for (k, v) in walktree(&path) {
-    entries.insert(k, v);
-}
-}
+    for path in opts.paths {
+        for (k, v) in walktree(&path) {
+            entries.insert(k, v);
+        }
+    }
     process(opts.sort, opts.reverse, entries);
 }
