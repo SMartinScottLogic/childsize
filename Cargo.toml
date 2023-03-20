@@ -7,7 +7,7 @@ edition = "2021"
 
 # Recursively walk a directory.
 [dependencies.walkdir]
-version = "^2.3.2"
+version = "^2.3.3"
 
 # A simple to use, efficient, and full-featured Command Line Argument Parser
 [dependencies.clap]
