@@ -8,10 +8,12 @@ use childsize::{process, walktree, ChildSizeEntry};
 #[clap(version = "1.0", author = "Havvoric <havvoric@gmail.com>")]
 struct Opts {
     paths: Vec<String>,
-    #[clap(short, long, possible_values=["average", "count", "max", "total"])]
+    #[clap(short, long, value_enum)]
     sort: childsize::SortMode,
     #[clap(short, long)]
     reverse: bool,
+    #[clap(short, long = "pattern")]
+    patterns: Vec<String>,
 }
 
 fn main() {
@@ -20,8 +22,14 @@ fn main() {
 
     let mut entries: HashMap<String, ChildSizeEntry> = HashMap::new();
 
+    let mut builder = globset::GlobSetBuilder::new();
+    for glob in opts.patterns {
+        builder.add(globset::Glob::new(&glob).unwrap());
+    }
+    let globset = builder.build().unwrap();
+
     for path in opts.paths {
-        for (k, v) in walktree(&path) {
+        for (k, v) in walktree(&path, &globset) {
             entries.insert(k, v);
         }
     }

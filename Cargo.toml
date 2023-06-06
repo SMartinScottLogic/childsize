@@ -3,6 +3,9 @@ name = "childsize"
 version = "0.1.0"
 edition = "2021"
 
+[dependencies.globset]
+version = "0.4.10"
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 # Recursively walk a directory.
@@ -11,11 +14,12 @@ version = "^2.3.2"
 
 # A simple to use, efficient, and full-featured Command Line Argument Parser
 [dependencies.clap]
-version = "~3.0.0-beta.5"
+version = "4.3"
+features = ["derive"]
 
 # A Rust crate for producing string-representations of numbers, formatted according to internatio…
 [dependencies.num-format]
-version = "0.4.0"
+version = "0.4"
 features = ["with-system-locale"]
 
 # an utility for human-readable bytes representations
