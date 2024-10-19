@@ -129,6 +129,7 @@ fn filefold(
     if e.file_type().is_file() && globset.is_match(e.file_name()) {
         let key = key(e.path(), base).unwrap_or_default();
         if let Ok(metadata) = e.metadata() {
+            //println!("key={}, path={:?}, base={}, file_name={:?}", key, e.path(), base, e.file_name());
             let entry = acc.entry(key).or_insert_with(ChildSizeEntry::new);
             let size = ByteSize::b(metadata.len());
             *entry += size;
@@ -147,6 +148,12 @@ fn key(path: &std::path::Path, base: &str) -> Option<String> {
         }
     };
     //println!("r: {r:?}");
+    match r.parent() {
+        None => Some(base.to_string()),
+        Some(p) if p == std::path::Path::new("") => Some(base.to_string()),
+        Some(parent) => Some(std::path::Path::new(base).join(parent).as_os_str().to_string_lossy().to_string()),
+    }
+    /*
     match r.parent() {
         None => {
             let r = Some(base.to_string());
@@ -167,6 +174,7 @@ fn key(path: &std::path::Path, base: &str) -> Option<String> {
         let v = std::path::Path::new(base).join(v);
         v.as_os_str().to_string_lossy().to_string()
     })
+    */
 }
 
 #[cfg(test)]
