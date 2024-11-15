@@ -14,6 +14,8 @@ struct Opts {
     reverse: bool,
     #[clap(short, long = "pattern")]
     patterns: Vec<String>,
+    #[clap(short = 'z', long)]
+    show_summary: bool,
 }
 
 fn main() {
@@ -33,5 +35,5 @@ fn main() {
             entries.insert(k, v);
         }
     }
-    process(opts.sort, opts.reverse, entries);
+    process(opts.sort, opts.reverse, opts.show_summary, entries);
 }

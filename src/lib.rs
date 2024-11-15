@@ -63,6 +63,14 @@ impl AddAssign<ByteSize> for ChildSizeEntry {
     }
 }
 
+static mut SUMMARY: ChildSizeEntry = ChildSizeEntry {
+    min: ByteSize::pib(1),
+    count: 0,
+    total: bytesize::ByteSize(0),
+    average: bytesize::ByteSize(0),
+    max: bytesize::ByteSize(0),
+};
+
 impl FromStr for SortMode {
     type Err = &'static str;
 
@@ -88,7 +96,12 @@ pub fn walktree(path: &str, globset: &globset::GlobSet) -> HashMap<String, Child
 }
 
 /// Produce table to stdout, based on supplied sorting and direction
-pub fn process(sort: SortMode, reverse: bool, entries: HashMap<String, ChildSizeEntry>) {
+pub fn process(
+    sort: SortMode,
+    reverse: bool,
+    show_summary: bool,
+    entries: HashMap<String, ChildSizeEntry>,
+) {
     let mut entries: Vec<_> = entries
         .into_iter()
         .map(|(file, mut entry)| {
@@ -118,6 +131,18 @@ pub fn process(sort: SortMode, reverse: bool, entries: HashMap<String, ChildSize
             entry.1.count, entry.1.total, entry.1.average, entry.1.max, entry.0
         );
     }
+    if show_summary {
+        let summary = unsafe {
+            SUMMARY.update_average();
+            format!(
+                "{} {} {} {} {}",
+                SUMMARY.count, SUMMARY.total, SUMMARY.average, SUMMARY.max, "SUMMARY"
+            )
+        };
+        println!("{}", "=".repeat(summary.len()));
+        println!("{}", summary);
+        println!("{}", "=".repeat(summary.len()));
+    }
 }
 
 fn filefold(
@@ -133,6 +158,7 @@ fn filefold(
             let entry = acc.entry(key).or_insert_with(ChildSizeEntry::new);
             let size = ByteSize::b(metadata.len());
             *entry += size;
+            unsafe { SUMMARY += size };
         }
     }
     acc
@@ -147,34 +173,17 @@ fn key(path: &std::path::Path, base: &str) -> Option<String> {
             return None
         }
     };
-    //println!("r: {r:?}");
     match r.parent() {
         None => Some(base.to_string()),
         Some(p) if p == std::path::Path::new("") => Some(base.to_string()),
-        Some(parent) => Some(std::path::Path::new(base).join(parent).as_os_str().to_string_lossy().to_string()),
+        Some(parent) => Some(
+            std::path::Path::new(base)
+                .join(parent)
+                .as_os_str()
+                .to_string_lossy()
+                .to_string(),
+        ),
     }
-    /*
-    match r.parent() {
-        None => {
-            let r = Some(base.to_string());
-            //println!("r: {r:?}");
-            return r;
-        }
-        Some(p) if p == std::path::Path::new("") => {
-            let r = Some(base.to_string());
-            //println!("r: {r:?}");
-            return r;
-        }
-        Some(parent) => parent,
-    }
-    .components()
-    .next()
-    .map(|v| {
-        //println!("v: {v:?}");
-        let v = std::path::Path::new(base).join(v);
-        v.as_os_str().to_string_lossy().to_string()
-    })
-    */
 }
 
 #[cfg(test)]
