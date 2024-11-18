@@ -14,7 +14,7 @@ version = "^2.3.3"
 
 # A simple to use, efficient, and full-featured Command Line Argument Parser
 [dependencies.clap]
-version = "4.4"
+version = "4.5"
 features = ["derive"]
 
 # A Rust crate for producing string-representations of numbers, formatted according to internatio…
